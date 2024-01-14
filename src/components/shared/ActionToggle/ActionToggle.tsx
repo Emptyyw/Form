@@ -13,11 +13,14 @@ export function ActionToggle() {
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
   });
+  const toggleColorScheme = () => {
+    setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <Group className={cx(classes.group)} justify="end">
       <ActionIcon
-        onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
+        onClick={toggleColorScheme}
         variant="default"
         size="xl"
         aria-label="Toggle color scheme"

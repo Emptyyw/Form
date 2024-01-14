@@ -1,3 +1,4 @@
+import React from 'react';
 import App from './App';
 import { createRoot } from 'react-dom/client';
 import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';

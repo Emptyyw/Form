@@ -7,22 +7,26 @@ import {
   Blockquote,
   Text,
   Group,
+  Anchor,
 } from '@mantine/core';
 import { IconFolderFilled, IconInfoCircle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-import { useProfile } from '../context/ProfileContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import classes from '../components/Modules/Profile.module.css';
+import cx from 'clsx';
 
 const Profile: React.FC = () => {
-  const { profileData } = useProfile();
+  const { firstName, lastName, telegram, github, resume, email, phone, about } =
+    useSelector((state: RootState) => state.form);
+
   const icon = <IconInfoCircle />;
 
   return (
     <Container size="md">
       <Group mt="md">
         <Avatar radius="xxl" size="xl" color="myColor">
-          {profileData.firstName && profileData.lastName
-            ? `${profileData.firstName[0]}${profileData.lastName[0]}`
-            : 'АИ'}
+          {firstName && lastName ? `${firstName[0]}${lastName[0]}` : 'АИ'}
         </Avatar>
 
         <Text
@@ -30,53 +34,48 @@ const Profile: React.FC = () => {
           variant="gradient"
           gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
         >
-          {profileData.firstName}
+          {firstName}
         </Text>
         <Text
           size="xl"
           variant="gradient"
           gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
         >
-          {profileData.lastName}
+          {lastName}
         </Text>
       </Group>
       <Group mt="md">
-        <Text>
-          <a
-            style={{ display: 'flex', alignItems: 'center' }}
-            href={`https://t.me/${profileData.telegram}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IconFolderFilled />
-            Telegram
-          </a>
-        </Text>
-        <Text>
-          <a style={{ display: 'flex', alignItems: 'center' }} href={profileData.github}>
-            <IconFolderFilled />
-            GitHub
-          </a>
-        </Text>
+        <Anchor
+          className={cx(classes.link)}
+          href={`https://t.me/${telegram}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <IconFolderFilled />
+          Telegram
+        </Anchor>
 
-        <Text>
-          <a
-            style={{ display: 'flex', alignItems: 'center' }}
-            href={profileData.resume}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IconFolderFilled />
-            Resume
-          </a>
-        </Text>
+        <Anchor className={cx(classes.link)} href={github}>
+          <IconFolderFilled />
+          GitHub
+        </Anchor>
+
+        <Anchor
+          className={cx(classes.link)}
+          href={resume}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <IconFolderFilled />
+          Resume
+        </Anchor>
       </Group>
       <TextInput
         mt="md"
         withAsterisk
         label="Email"
         placeholder="your@email.com"
-        value={profileData.email}
+        value={email}
         disabled={true}
       />
       <TextInput
@@ -85,10 +84,10 @@ const Profile: React.FC = () => {
         label="Номер телефона"
         placeholder="+7 99-999-999"
         disabled={true}
-        value={profileData.phone}
+        value={phone}
       />
       <Blockquote mt="xl" color="myColor" cite="– About" icon={icon}>
-        {profileData.about}
+        {about}
       </Blockquote>
 
       <Link to="/form">

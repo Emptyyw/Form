@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Stepper,
   Button,
@@ -14,46 +13,32 @@ import {
   Title,
   Textarea,
 } from '@mantine/core';
-import { useForm, hasLength } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { IconTrashFilled, IconAt } from '@tabler/icons-react';
 import AddButton from './shared/AddButton/AddButton';
 import MyModal from './shared/Modal/Modal';
-import { useProfile } from '../context/ProfileContext';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from '../redux/store';
-import { submitFormData } from '../redux/slices/FormSlice';
+import type { RootState } from '../redux/store';
+import { openModal, selectModalSuccess } from '../redux/slices/ModalSlice';
+import {
+  updateProfileData,
+  FormInitialState,
+  submitFormData,
+} from '../redux/slices/FormSlice';
+import { useEffect, useState } from 'react';
 
-export interface ProfileFormData {
-  firstName: string;
-  lastName: string;
-  nickname: string;
-  email: string;
-  resume: string;
-  phone: string;
-  about: string;
-  github: string;
-  telegram: string;
-  advantages: string;
-  advantages2: string;
-  advantages3: string;
-  file: File | null;
-  selectedSex: string[];
-  checkboxGroup: string[];
-}
 interface IFormProps {
-  onFormSubmit: (formData: ProfileFormData) => void;
+  onFormSubmit: (formData: FormInitialState) => void;
 }
+
 const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
-  const { profileData, updateProfileData } = useProfile();
-  const dispatch = useDispatch<AppDispatch>();
-  const isFetching = useSelector((state: RootState) => state.form.isFetching);
-  const isSuccess = useSelector((state: RootState) => state.form.isSuccess);
-
+  const dispatch = useDispatch();
+  const formValues = useSelector((state: RootState) => state.form);
   const [active, setActive] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [success, setIsSuccess] = useState(true);
+  const modalSuccess = useSelector(selectModalSuccess);
+  const [isSuccess, setIsSuccess] = useState(true);
 
-  const form = useForm<ProfileFormData>({
+  const form = useForm<FormInitialState>({
     initialValues: {
       nickname: 'Doe23',
       firstName: 'Doe',
@@ -67,9 +52,9 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
       advantages2: 'advantages-2',
       advantages3: 'advantages-3',
       about: 'I am Frontend ',
-      file: null as File | null,
-      selectedSex: [],
-      checkboxGroup: [],
+      file: null,
+      selectedSex: formValues.selectedSex || [],
+      checkboxGroup: formValues.checkboxGroup || [],
     },
 
     validate: values => {
@@ -102,40 +87,40 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
       return {};
     },
   });
-
+  enum Steps {
+    First = 0,
+    Second = 1,
+    Third = 2,
+    Fourth = 3,
+  }
   const nextStep = () =>
     setActive(current => {
       if (form.validate().hasErrors) {
         return current;
       }
-      return current < 3 ? current + 1 : current;
+      return current < Steps.Fourth ? current + Steps.Second : current;
     });
 
-  const prevStep = () => setActive(current => (current > 0 ? current - 1 : current));
+  const prevStep = () =>
+    setActive(current => (current > Steps.First ? current - Steps.Second : current));
+
+  useEffect(() => {
+    if (form.form) {
+      form.form.setValues(formValues);
+    }
+  }, [formValues]);
 
   const handleSubmit = async () => {
     try {
-      if (!form.validate().hasErrors) {
-        const action = await dispatch(submitFormData(form.values));
-
-        if (submitFormData.fulfilled.match(action)) {
-          const responseData = action.payload;
-          console.log(responseData);
-          updateProfileData(responseData);
-          setIsSuccess(true);
-        }
-      }
+      const response = await dispatch(submitFormData(form.values)).unwrap();
+      dispatch(updateProfileData(form.values));
+      dispatch(openModal({ success: true, message: 'Форма успешно отправлена.' }));
+      setIsSuccess(true);
     } catch (error) {
+      dispatch(openModal({ success: false, message: 'Что-то пошло не так.' }));
       setIsSuccess(false);
-    } finally {
-      setModalOpen(true);
     }
   };
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
-
   const handleFileChange = (file: File | null) => {
     console.log('File in form:', file);
     form.setFieldValue('file', file);
@@ -153,36 +138,15 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
     }
   };
 
-  console.log(form.values);
-
   return (
     <Container size="md">
       <Stepper iconSize={32} active={active}>
         <Stepper.Step>
-          <TextInput
-            label="Nickname"
-            placeholder="nickname"
-            {...form.getInputProps('nickname')}
-          />
+          <TextInput label="Nickname" {...form.getInputProps('nickname')} />
 
-          <TextInput
-            mt="md"
-            label="Name"
-            placeholder="name"
-            {...form.getInputProps('firstName')}
-          />
-          <TextInput
-            mt="md"
-            label="Surname"
-            placeholder="surname"
-            {...form.getInputProps('lastName')}
-          />
-          <TextInput
-            mt="md"
-            label="Email"
-            placeholder="example@gmail.com"
-            {...form.getInputProps('email')}
-          />
+          <TextInput mt="md" label="FirstName" {...form.getInputProps('firstName')} />
+          <TextInput mt="md" label="LastName" {...form.getInputProps('lastName')} />
+          <TextInput mt="md" label="Email" {...form.getInputProps('email')} />
           <TextInput
             mt="md"
             label="Phone"
@@ -207,7 +171,6 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
         <Stepper.Step>
           <Input.Wrapper label="Advantages">
             <TextInput
-              placeholder="Placeholder"
               {...form.getInputProps('advantages')}
               mt="md"
               rightSection={
@@ -219,7 +182,6 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
               }
             />
             <TextInput
-              placeholder="Placeholder"
               {...form.getInputProps('advantages2')}
               mt="md"
               rightSection={
@@ -231,7 +193,6 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
               }
             />
             <TextInput
-              placeholder="Placeholder"
               {...form.getInputProps('advantages3')}
               mt="md"
               rightSection={
@@ -277,12 +238,7 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
         </Stepper.Step>
 
         <Stepper.Step>
-          <TextInput
-            mt="md"
-            label="GitHub"
-            placeholder="GitHub"
-            {...form.getInputProps('github')}
-          />
+          <TextInput mt="md" label="GitHub" {...form.getInputProps('github')} />
           <TextInput
             leftSection={<IconAt size={16} />}
             mt="md"
@@ -290,15 +246,9 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
             placeholder="Telegram username"
             {...form.getInputProps('telegram')}
           />
-          <TextInput
-            mt="md"
-            label="Resume"
-            placeholder="Resume"
-            {...form.getInputProps('resume')}
-          />
+          <TextInput mt="md" label="Resume" {...form.getInputProps('resume')} />
           <Textarea
             mt="xl"
-            placeholder="Placeholder"
             label="About"
             autosize
             minRows={2}
@@ -329,7 +279,7 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
         {active === 3 && (
           <>
             <Button onClick={handleSubmit}>Отправить</Button>
-            {modalOpen && <MyModal onClose={closeModal} success={isSuccess} />}
+            <MyModal onClose={onFormSubmit} success={modalSuccess} />
           </>
         )}
       </Group>
