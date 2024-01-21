@@ -3,6 +3,7 @@ import App from './App';
 import { createRoot } from 'react-dom/client';
 import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';
 import '@mantine/core/styles.css';
+import { ModalsProvider } from '@mantine/modals';
 
 import './index.css';
 
@@ -29,6 +30,8 @@ const theme = createTheme({
 
 createRoot(document.getElementById('root')!).render(
   <MantineProvider theme={theme}>
-    <App />
+    <ModalsProvider>
+      <App />
+    </ModalsProvider>
   </MantineProvider>,
 );

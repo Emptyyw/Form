@@ -18,31 +18,28 @@ import { IconTrashFilled, IconAt } from '@tabler/icons-react';
 import AddButton from './shared/AddButton/AddButton';
 import MyModal from './shared/Modal/Modal';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../redux/store';
-import { openModal, selectModalSuccess } from '../redux/slices/ModalSlice';
-import {
-  updateProfileData,
-  FormInitialState,
-  submitFormData,
-} from '../redux/slices/FormSlice';
+import { ProfileState } from '../redux/slices/ProfileSlice';
+import { Steps } from '../enums/Enums';
 import { useEffect, useState } from 'react';
-
+import { RootState } from '../redux/store';
+import { submitFormData } from '../redux/slices/FormSlice';
+import { UserInfo } from '../types/Types';
+import { updateProfileInfo } from '../redux/slices/ProfileSlice';
 interface IFormProps {
-  onFormSubmit: (formData: FormInitialState) => void;
+  onFormSubmit: (formData: ProfileState) => void;
 }
 
 const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
   const dispatch = useDispatch();
-  const formValues = useSelector((state: RootState) => state.form);
   const [active, setActive] = useState(0);
-  const modalSuccess = useSelector(selectModalSuccess);
-  const [isSuccess, setIsSuccess] = useState(true);
+  const formValues = useSelector((state: RootState) => state.form);
+  const modalSuccess = useSelector((state: RootState) => state.modal);
 
-  const form = useForm<FormInitialState>({
+  const form = useForm<UserInfo>({
     initialValues: {
       nickname: 'Doe23',
-      firstName: 'Doe',
-      lastName: 'John',
+      firstName: 'John',
+      lastName: 'Doe',
       email: 'johndoe2024@gmail.com',
       phone: '+7 88-888-888',
       github: 'https://github.com/Emptyyw',
@@ -58,7 +55,7 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
     },
 
     validate: values => {
-      if (active === 0) {
+      if (active === Steps.First) {
         return {
           name:
             values.firstName.trim().length < 2
@@ -76,23 +73,13 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
         };
       }
 
-      if (active === 1) {
-        return {
-          name:
-            values.firstName.trim().length < 2
-              ? 'Name must include at least 2 characters'
-              : null,
-        };
+      if (active === Steps.Second) {
+        return {};
       }
       return {};
     },
   });
-  enum Steps {
-    First = 0,
-    Second = 1,
-    Third = 2,
-    Fourth = 3,
-  }
+
   const nextStep = () =>
     setActive(current => {
       if (form.validate().hasErrors) {
@@ -105,22 +92,16 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
     setActive(current => (current > Steps.First ? current - Steps.Second : current));
 
   useEffect(() => {
-    if (form.form) {
-      form.form.setValues(formValues);
+    if (formValues.isSuccess) {
+      dispatch(updateProfileInfo(form.values));
+      form.reset();
     }
-  }, [formValues]);
+  }, [formValues.isSuccess, form.values, dispatch, form]);
 
   const handleSubmit = async () => {
-    try {
-      const response = await dispatch(submitFormData(form.values)).unwrap();
-      dispatch(updateProfileData(form.values));
-      dispatch(openModal({ success: true, message: 'Форма успешно отправлена.' }));
-      setIsSuccess(true);
-    } catch (error) {
-      dispatch(openModal({ success: false, message: 'Что-то пошло не так.' }));
-      setIsSuccess(false);
-    }
+    dispatch(submitFormData(form.values));
   };
+
   const handleFileChange = (file: File | null) => {
     console.log('File in form:', file);
     form.setFieldValue('file', file);
@@ -260,7 +241,7 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
           <Code block mt="xl">
             {form.values.file && (
               <>
-                <div>File Name: {form.values.file.name}</div>
+                <Code>File Name: {form.values.file.name}</Code>
                 <br />
               </>
             )}
@@ -269,17 +250,17 @@ const Form: React.FC<IFormProps> = ({ onFormSubmit }) => {
         </Stepper.Completed>
       </Stepper>
       <Group justify="space-between" mt="xl">
-        {active !== 0 && (
+        {active !== Steps.First && (
           <Button variant="outline" onClick={prevStep}>
             Back
           </Button>
         )}
 
-        {active !== 3 && <Button onClick={nextStep}>Next step</Button>}
-        {active === 3 && (
+        {active !== Steps.Fourth && <Button onClick={nextStep}>Next step</Button>}
+        {active === Steps.Fourth && (
           <>
             <Button onClick={handleSubmit}>Отправить</Button>
-            <MyModal onClose={onFormSubmit} success={modalSuccess} />
+            <MyModal />
           </>
         )}
       </Group>

@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import formReducer from './slices/FormSlice';
-import ModalSlice from './slices/ModalSlice';
+import modalReducer from './slices/ModalSlice';
+import profileReducer from './slices/ProfileSlice';
 
 const store = configureStore({
   reducer: {
     form: formReducer,
-    modal: ModalSlice,
+    modal: modalReducer,
+    profile: profileReducer,
   },
 });
 export type AppDispatch = typeof store.dispatch;

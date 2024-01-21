@@ -8,19 +8,18 @@ import {
   Text,
   Group,
   Anchor,
+  Flex,
 } from '@mantine/core';
 import { IconFolderFilled, IconInfoCircle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
-import classes from '../components/Modules/Profile.module.css';
-import cx from 'clsx';
+
+const icon = <IconInfoCircle />;
 
 const Profile: React.FC = () => {
   const { firstName, lastName, telegram, github, resume, email, phone, about } =
-    useSelector((state: RootState) => state.form);
-
-  const icon = <IconInfoCircle />;
+    useSelector((state: RootState) => state.profile.userInfo);
 
   return (
     <Container size="md">
@@ -46,28 +45,28 @@ const Profile: React.FC = () => {
       </Group>
       <Group mt="md">
         <Anchor
-          className={cx(classes.link)}
           href={`https://t.me/${telegram}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <IconFolderFilled />
-          Telegram
+          <Flex>
+            <IconFolderFilled />
+            Telegram
+          </Flex>
         </Anchor>
 
-        <Anchor className={cx(classes.link)} href={github}>
-          <IconFolderFilled />
-          GitHub
+        <Anchor href={github}>
+          <Flex>
+            <IconFolderFilled />
+            GitHub
+          </Flex>
         </Anchor>
 
-        <Anchor
-          className={cx(classes.link)}
-          href={resume}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IconFolderFilled />
-          Resume
+        <Anchor href={resume} target="_blank" rel="noopener noreferrer">
+          <Flex>
+            <IconFolderFilled />
+            Resume
+          </Flex>
         </Anchor>
       </Group>
       <TextInput

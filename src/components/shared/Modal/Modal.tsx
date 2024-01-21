@@ -1,12 +1,10 @@
 import React from 'react';
-import { Modal, Button, Flex } from '@mantine/core';
+import { Button, Flex, Modal } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { IconCircleCheckFilled, IconCircleXFilled } from '@tabler/icons-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeModal } from '../../../redux/slices/ModalSlice';
 import { RootState } from '../../../redux/store';
-
-
 
 const MyModal: React.FC = () => {
   const dispatch = useDispatch();
