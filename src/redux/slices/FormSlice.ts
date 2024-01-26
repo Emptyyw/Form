@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { openModal } from './ModalSlice';
-import { RootState } from '../store';
-import { UserInfo } from '../../types/Types';
+import { type RootState } from '../store';
+import { type UserInfo } from '../../types/Types';
 import { initialProfileState } from './ProfileSlice';
+import { modals } from '@mantine/modals';
 
 export const setFormToInitialState = createAction('setFormToInitialState');
-
+export const redirect = createAction('redirect');
 export interface FormInitialState extends UserInfo {
   isModalOpen: boolean;
   modalSuccess: boolean;
@@ -40,20 +40,29 @@ export const submitFormData = createAsyncThunk(
         }`,
         userInfo,
       );
-      dispatch(
-        openModal({
-          success: true,
-          message: 'Форма успешно отправлена.',
-        }),
-      );
+      modals.openConfirmModal({
+        title: 'Успех!',
+        children: 'Форма успешно отправлена.',
+        labels: { confirm: 'ОК', cancel: 'Отмена' },
+        onConfirm: () => {
+          dispatch(setSuccess());
+          dispatch(redirect());
+        },
+        onCancel: () => {
+          dispatch(resetForm());
+          dispatch(redirect());
+        },
+      });
       return response.data;
     } catch (error) {
-      dispatch(
-        openModal({
-          success: false,
-          message: 'Что-то пошло не так.',
-        }),
-      );
+      modals.openConfirmModal({
+        title: 'Ошибка!',
+        children: 'Что-то пошло не так.',
+        labels: { confirm: 'ОК', cancel: 'Отмена' },
+        onConfirm: () => {
+          dispatch(resetForm());
+        },
+      });
       console.error('Error in submit', error);
       dispatch(setFormToInitialState());
       throw error;
@@ -65,25 +74,28 @@ const formSlice = createSlice({
   name: 'form',
   initialState,
   reducers: {
-    setSuccess: state => {
+    setSuccess: (state) => {
       return { ...state, isSuccess: true };
     },
     updateProfileData: (state, action) => {
       state.formData = action.payload;
-      if (state.isSuccess === false) {
+      if (!state.isSuccess) {
         state.formData = initialState.formData;
       }
     },
-    resetForm: state => {
+    resetForm: (state) => {
       return {
         ...state,
         formData: initialState.formData,
       };
     },
+    redirect: (state) => {
+      state.isSuccess = false;
+    },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(submitFormData.pending, state => {
+      .addCase(submitFormData.pending, (state) => {
         state.isFetching = true;
         state.error = null;
       })
@@ -96,12 +108,13 @@ const formSlice = createSlice({
         state.isSuccess = false;
         state.isFetching = false;
         state.error = action.error.message || 'error';
+        state.formData = initialState.formData;
       });
   },
 });
 
 export const selectFormData = (state: RootState) => state.form;
 
-export const { setSuccess, updateProfileData } = formSlice.actions;
+export const { setSuccess, updateProfileData, resetForm } = formSlice.actions;
 
 export default formSlice.reducer;

@@ -1,7 +1,7 @@
 import React from 'react';
 import App from './App';
 import { createRoot } from 'react-dom/client';
-import { MantineProvider, createTheme, MantineColorsTuple } from '@mantine/core';
+import { MantineProvider, createTheme, type MantineColorsTuple } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { ModalsProvider } from '@mantine/modals';
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Group, Text, FileButton } from '@mantine/core';
 
 interface AddButtonProps {
-  onChange: (file: File | null) => void;
+  onChange: (file: File | null) => void
 }
 
 const AddButton: React.FC<AddButtonProps> = ({ onChange }) => {

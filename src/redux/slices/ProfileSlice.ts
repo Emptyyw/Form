@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { UserInfo } from '../../types/Types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type UserInfo } from '../../types/Types';
 
 export interface ProfileState {
-  userInfo: UserInfo;
+  userInfo: UserInfo
 }
 
 export const initialProfileState: ProfileState = {
@@ -21,7 +21,12 @@ export const initialProfileState: ProfileState = {
     about: '',
     file: null,
     selectedSex: [],
-    checkboxGroup: [],
+    checkbox1: false,
+    checkbox2: false,
+    checkbox3: false,
+    radio1: false,
+    radio2: false,
+    radio3: false,
   },
 };
 

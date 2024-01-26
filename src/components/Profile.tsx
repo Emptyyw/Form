@@ -13,41 +13,39 @@ import {
 import { IconFolderFilled, IconInfoCircle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-
-const icon = <IconInfoCircle />;
+import type { RootState } from '../redux/store';
 
 const Profile: React.FC = () => {
   const { firstName, lastName, telegram, github, resume, email, phone, about } =
     useSelector((state: RootState) => state.profile.userInfo);
 
   return (
-    <Container size="md">
-      <Group mt="md">
-        <Avatar radius="xxl" size="xl" color="myColor">
+    <Container size='md'>
+      <Group mt='md'>
+        <Avatar radius='xxl' size='xl' color='myColor'>
           {firstName && lastName ? `${firstName[0]}${lastName[0]}` : 'АИ'}
         </Avatar>
 
         <Text
-          size="xl"
-          variant="gradient"
+          size='xl'
+          variant='gradient'
           gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
         >
           {firstName}
         </Text>
         <Text
-          size="xl"
-          variant="gradient"
+          size='xl'
+          variant='gradient'
           gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
         >
           {lastName}
         </Text>
       </Group>
-      <Group mt="md">
+      <Group mt='md'>
         <Anchor
           href={`https://t.me/${telegram}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          target='_blank'
+          rel='noopener noreferrer'
         >
           <Flex>
             <IconFolderFilled />
@@ -62,7 +60,7 @@ const Profile: React.FC = () => {
           </Flex>
         </Anchor>
 
-        <Anchor href={resume} target="_blank" rel="noopener noreferrer">
+        <Anchor href={resume} target='_blank' rel='noopener noreferrer'>
           <Flex>
             <IconFolderFilled />
             Resume
@@ -70,27 +68,27 @@ const Profile: React.FC = () => {
         </Anchor>
       </Group>
       <TextInput
-        mt="md"
+        mt='md'
         withAsterisk
-        label="Email"
-        placeholder="your@email.com"
+        label='Email'
+        placeholder='your@email.com'
         value={email}
         disabled={true}
       />
       <TextInput
-        mt="md"
+        mt='md'
         withAsterisk
-        label="Номер телефона"
-        placeholder="+7 99-999-999"
+        label='Номер телефона'
+        placeholder='+7 99-999-999'
         disabled={true}
         value={phone}
       />
-      <Blockquote mt="xl" color="myColor" cite="– About" icon={icon}>
+      <Blockquote mt='xl' color='myColor' cite='– About' icon={<IconInfoCircle />}>
         {about}
       </Blockquote>
 
-      <Link to="/form">
-        <Button mt="md" variant="filled" size="md">
+      <Link to='/form'>
+        <Button mt='md' variant='filled' size='md'>
           Начать
         </Button>
       </Link>
