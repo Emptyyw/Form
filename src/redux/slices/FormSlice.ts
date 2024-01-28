@@ -1,12 +1,10 @@
-import { createSlice, createAsyncThunk, createAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { type RootState } from '../store';
 import { type UserInfo } from '../../types/Types';
 import { initialProfileState } from './ProfileSlice';
 import { modals } from '@mantine/modals';
 
-export const setFormToInitialState = createAction('setFormToInitialState');
-export const redirect = createAction('redirect');
 export interface FormInitialState extends UserInfo {
   isModalOpen: boolean;
   modalSuccess: boolean;
@@ -46,11 +44,9 @@ export const submitFormData = createAsyncThunk(
         labels: { confirm: 'ОК', cancel: 'Отмена' },
         onConfirm: () => {
           dispatch(setSuccess());
-          dispatch(redirect());
         },
         onCancel: () => {
           dispatch(resetForm());
-          dispatch(redirect());
         },
       });
       return response.data;
@@ -63,8 +59,7 @@ export const submitFormData = createAsyncThunk(
           dispatch(resetForm());
         },
       });
-      console.error('Error in submit', error);
-      dispatch(setFormToInitialState());
+      dispatch(resetForm());
       throw error;
     }
   },
@@ -88,9 +83,6 @@ const formSlice = createSlice({
         ...state,
         formData: initialState.formData,
       };
-    },
-    redirect: (state) => {
-      state.isSuccess = false;
     },
   },
   extraReducers: (builder) => {

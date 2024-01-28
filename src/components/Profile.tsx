@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import {
   Avatar,
   TextInput,
@@ -15,9 +15,10 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../redux/store';
 
-const Profile: React.FC = () => {
+const Profile: FC = () => {
   const { firstName, lastName, telegram, github, resume, email, phone, about } =
     useSelector((state: RootState) => state.profile.userInfo);
+  const gradientConfig = { from: 'grape', to: 'yellow', deg: 149 };
 
   return (
     <Container size='md'>
@@ -26,18 +27,10 @@ const Profile: React.FC = () => {
           {firstName && lastName ? `${firstName[0]}${lastName[0]}` : 'АИ'}
         </Avatar>
 
-        <Text
-          size='xl'
-          variant='gradient'
-          gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
-        >
+        <Text size='xl' variant='gradient' gradient={gradientConfig}>
           {firstName}
         </Text>
-        <Text
-          size='xl'
-          variant='gradient'
-          gradient={{ from: 'grape', to: 'yellow', deg: 149 }}
-        >
+        <Text size='xl' variant='gradient' gradient={gradientConfig}>
           {lastName}
         </Text>
       </Group>

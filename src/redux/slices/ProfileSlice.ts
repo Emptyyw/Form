@@ -2,7 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type UserInfo } from '../../types/Types';
 
 export interface ProfileState {
-  userInfo: UserInfo
+  userInfo: UserInfo;
 }
 
 export const initialProfileState: ProfileState = {
@@ -35,8 +35,6 @@ const profileSlice = createSlice({
   initialState: initialProfileState,
   reducers: {
     updateProfileInfo: (state, action: PayloadAction<Partial<UserInfo>>) => {
-      console.log('Обновление информации профиля:', action.payload);
-
       state.userInfo = {
         ...state.userInfo,
         ...action.payload,
